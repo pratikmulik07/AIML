@@ -1,50 +1,45 @@
-def depth_first_search(graph, start, goal):
-    visited = set()
-    order = []  # order of visited nodes
-    path = []   # actual path to goal
+game_map={
+    "Camp":["Forest","River"],
+    
+    "Forest":["Tresure Room"],
+    
+    "River":["Tresure Room"],
 
-    def dfs(node):
-        visited.add(node)
-        order.append(node)
-        path.append(node)
-
-        if node == goal:
-            return True  # goal found
-
-        for neighbour in graph[node]:
-            if neighbour not in visited:  # avoid re-visiting
-                if dfs(neighbour):  # recursive call
-                    return True  # stop when goal found
-
-        path.pop()  # backtrack
-        return False  # goal not found in this route
-
-    dfs(start)
-    return order, path
-
-
-# ---- Sample Game Map ----
-graph = {
-    "Camp": ["Forest", "River"],
-    "Forest": ["Cave", "Clearing"],
-    "Clearing": ["Tower"],
-    "River": ["Waterfall"],
-    "Cave": ["Treasure Room"],
-    "Tower": ["Treasure Room"],
-    "Waterfall": [],
-    "Treasure Room": []
+    "Tresure Room":[]
 }
 
-starting = "Camp"
-goal = "Waterfall"
+start_location = "Camp"
+target_location = "Tresure Room"
 
-order, path = depth_first_search(graph, starting, goal)
+visited=set()
 
-print("Traversal Order:")
-for step, node in enumerate(order, start=1):
-    print(f"{step}. {node}")
+def dfs_traverse(node):
+    print("Visting:",node)
+    visited.add(node)
+    for next_node in game_map[node]:
+        if next_node not in visited:
+            dfs_traverse(next_node)
 
-if path and path[-1] == goal:
-    print("\nTreasure Path:", " -> ".join(path))
-else:
-    print("\nGoal not found!")
+print("Order of Traversal(DFS)\n")
+dfs_traverse(start_location)
+
+def dfs_paths(current, goal, path=[]):
+    path = path + [current]
+
+    if current == goal:
+        return [path]
+
+    paths = []
+    for next_node in game_map[current]:
+        if next_node not in path:
+            new_paths = dfs_paths(next_node, goal, path)
+            for p in new_paths:
+                paths.append(p)
+
+    return paths
+
+print("\nAll possible paths to traverse:\n")
+paths = dfs_paths(start_location, target_location)
+
+for p in paths:
+    print(" -> ".join(p))
